@@ -1,138 +1,92 @@
-import math,random
+import pygame
+import math, random
+from constants import *
+from End_screen import *
 
-"""
-This was adapted from a GeeksforGeeks article "Program for Sudoku Generator" by Aarti_Rathi and Ankur Trisal
-https://www.geeksforgeeks.org/program-sudoku-generator/
+import math, random
 
-"""
 
+# class created to initialize the sudoku and make sure moves are valid
 class SudokuGenerator:
-    '''
-	create a sudoku board - initialize class variables and set up the 2D board
-	This should initialize:
-	self.row_length		- the length of each row
-	self.removed_cells	- the total number of cells to be removed
-	self.board			- a 2D list of ints to represent the board
-	self.box_length		- the square root of row_length
-
-	Parameters:
-    row_length is the number of rows/columns of the board (always 9 for this project)
-    removed_cells is an integer value - the number of cells to be removed
-
-	Return:
-	None
-    '''
     def __init__(self, row_length, removed_cells):
-        pass
+        self.row_length = 9
+        self.removed_cells = removed_cells
+        self.board = [[0 for i in range(row_length)] for j in range(row_length)]
+        self.box_length = int(math.sqrt(self.row_length))
 
-    '''
-	Returns a 2D python list of numbers which represents the board
-
-	Parameters: None
-	Return: list[list]
-    '''
+    # initializes rows, removed cells, and board with 0s
     def get_board(self):
-        pass
+        return self.board
 
-    '''
-	Displays the board to the console
-    This is not strictly required, but it may be useful for debugging purposes
-
-	Parameters: None
-	Return: None
-    '''
+    # returns board
     def print_board(self):
-        pass
+        for i in self.board:
+            print(i)
 
-    '''
-	Determines if num is contained in the specified row (horizontal) of the board
-    If num is already in the specified row, return False. Otherwise, return True
+        return self.board
 
-	Parameters:
-	row is the index of the row we are checking
-	num is the value we are looking for in the row
-	
-	Return: boolean
-    '''
     def valid_in_row(self, row, num):
-        pass
+        if num in self.board[row]:
+            return False
+        else:
+            return True
 
-    '''
-	Determines if num is contained in the specified column (vertical) of the board
-    If num is already in the specified col, return False. Otherwise, return True
-
-	Parameters:
-	col is the index of the column we are checking
-	num is the value we are looking for in the column
-	
-	Return: boolean
-    '''
     def valid_in_col(self, col, num):
-        pass
+        for i in range(9):
+            if self.board[i][col] == num:
+                return False
+        return True
 
-    '''
-	Determines if num is contained in the 3x3 box specified on the board
-    If num is in the specified box starting at (row_start, col_start), return False.
-    Otherwise, return True
-
-	Parameters:
-	row_start and col_start are the starting indices of the box to check
-	i.e. the box is from (row_start, col_start) to (row_start+2, col_start+2)
-	num is the value we are looking for in the box
-
-	Return: boolean
-    '''
     def valid_in_box(self, row_start, col_start, num):
-        pass
-    
-    '''
-    Determines if it is valid to enter num at (row, col) in the board
-    This is done by checking that num is unused in the appropriate, row, column, and box
+        row = row_start
+        col = col_start
 
-	Parameters:
-	row and col are the row index and col index of the cell to check in the board
-	num is the value to test if it is safe to enter in this cell
+        for i in range(3):
+            for j in range(3):
+                if self.board[row][col] == num:
+                    return False
+                else:
+                    col += 1
+            row += 1
+            col = col_start
 
-	Return: boolean
-    '''
+        return True
+
     def is_valid(self, row, col, num):
-        pass
+        row_start = (math.floor(row / 3) * 3)
+        col_start = (math.floor(col / 3) * 3)
 
-    '''
-    Fills the specified 3x3 box with values
-    For each position, generates a random digit which has not yet been used in the box
+        isValidInRow = self.valid_in_row(row, num)
+        isValidInCol = self.valid_in_col(col, num)
+        isValidInBox = self.valid_in_box(row_start, col_start, num)
 
-	Parameters:
-	row_start and col_start are the starting indices of the box to check
-	i.e. the box is from (row_start, col_start) to (row_start+2, col_start+2)
+        if isValidInRow and isValidInCol and isValidInBox:
+            return True
+        else:
+            return False
 
-	Return: None
-    '''
     def fill_box(self, row_start, col_start):
-        pass
-    
-    '''
-    Fills the three boxes along the main diagonal of the board
-    These are the boxes which start at (0,0), (3,3), and (6,6)
+        row = row_start
+        col = col_start
 
-	Parameters: None
-	Return: None
-    '''
+        for i in range(3):
+            for j in range(3):
+                while True:
+                    SetNumber = random.randint(1, 9)
+
+                    if self.valid_in_box(row_start, col_start, SetNumber):
+                        self.board[row][col] = SetNumber
+                        col += 1
+                        break
+
+            row += 1
+            col = col_start
+
     def fill_diagonal(self):
-        pass
+        self.fill_box(0, 0)
+        self.fill_box(3, 3)
+        self.fill_box(6, 6)
 
-    '''
-    DO NOT CHANGE
-    Provided for students
-    Fills the remaining cells of the board
-    Should be called after the diagonal boxes have been filled
-	
-	Parameters:
-	row, col specify the coordinates of the first empty (0) cell
-
-	Return:
-	boolean (whether or not we could solve the board)
-    '''
     def fill_remaining(self, row, col):
         if (col >= self.row_length and row < self.row_length - 1):
             row += 1
@@ -151,57 +105,32 @@ class SudokuGenerator:
                 col = 0
                 if row >= self.row_length:
                     return True
-        
+
         for num in range(1, self.row_length + 1):
-            if self.is_valid(row, col, num):
-                self.board[row][col] = num
+            if self.is_valid(int(row), int(col), int(num)):
+                self.board[int(row)][int(col)] = int(num)
                 if self.fill_remaining(row, col + 1):
                     return True
-                self.board[row][col] = 0
+                self.board[int(row)][int(col)] = 0
         return False
 
-    '''
-    DO NOT CHANGE
-    Provided for students
-    Constructs a solution by calling fill_diagonal and fill_remaining
-
-	Parameters: None
-	Return: None
-    '''
     def fill_values(self):
         self.fill_diagonal()
         self.fill_remaining(0, self.box_length)
 
-    '''
-    Removes the appropriate number of cells from the board
-    This is done by setting some values to 0
-    Should be called after the entire solution has been constructed
-    i.e. after fill_values has been called
-    
-    NOTE: Be careful not to 'remove' the same cell multiple times
-    i.e. if a cell is already 0, it cannot be removed again
-
-	Parameters: None
-	Return: None
-    '''
     def remove_cells(self):
-        pass
+        num = self.removed_cells
+        NumberOfRemovedCells = 0
 
-'''
-DO NOT CHANGE
-Provided for students
-Given a number of rows and number of cells to remove, this function:
-1. creates a SudokuGenerator
-2. fills its values and saves this as the solved state
-3. removes the appropriate number of cells
-4. returns the representative 2D Python Lists of the board and solution
+        while NumberOfRemovedCells < num:
+            remove_row = random.randint(0, 8)
+            remove_col = random.randint(0, 8)
 
-Parameters:
-size is the number of rows/columns of the board (9 for this project)
-removed is the number of cells to clear (set to 0)
+            if self.board[remove_row][remove_col] != 0:
+                self.board[remove_row][remove_col] = 0
+                NumberOfRemovedCells += 1
 
-Return: list[list] (a 2D Python list to represent the board)
-'''
+
 def generate_sudoku(size, removed):
     sudoku = SudokuGenerator(size, removed)
     sudoku.fill_values()
@@ -209,3 +138,253 @@ def generate_sudoku(size, removed):
     sudoku.remove_cells()
     board = sudoku.get_board()
     return board
+
+
+# to display the sudoku after we remove cells
+
+class Cell:
+    def __init__(self, value, row, col, screen):
+        self.value = value
+        self.row = row
+        self.col = col
+        self.screen = screen
+
+        self.SketchedValue = None
+
+    def set_cell_value(self, value):
+        pass
+
+    def set_sketched_value(self, value):
+        self.SketchedValue = value
+
+    def draw(self, SelectedCell):
+        pygame.font.init()
+
+        if self.value != 0:
+            font = pygame.font.SysFont('Arial', 25, bold=False)
+
+            img = font.render(str(self.value), True, pygame.Color(0, 0, 0), pygame.Color(255, 255, 255))
+            position = (
+                (CELL_SIZE * self.col + (CELL_SIZE / 2)) - 5,
+                (CELL_SIZE * self.row + (CELL_SIZE / 2)) - 10
+            )
+            self.screen.blit(img, position)
+
+        if SelectedCell != None:
+            if SelectedCell[0] == self.row and SelectedCell[1] == self.col:
+                color = (255, 0, 0)
+                left = self.row * (600 / 9)
+                top = self.col * (600 / 9)
+                pygame.draw.rect(self.screen, color, pygame.Rect(left, top, 600 / 9, 600 / 9), LINE_WIDTH)
+
+        if self.SketchedValue != None:
+            font = pygame.font.SysFont('Arial', 25, bold=False)
+
+            img = font.render(str(self.SketchedValue), True, pygame.Color(80, 80, 80), pygame.Color(255, 255, 255))
+            position = (
+                (CELL_SIZE * self.col) + 13,
+                (CELL_SIZE * self.row) + 13
+            )
+            self.screen.blit(img, position)
+
+
+# check Board.py file and fix it
+class Board:
+
+    def __init__(self, width, height, screen, difficulty):
+        self.width = width
+        self.height = height
+        self.screen = screen
+        self.difficulty = difficulty
+
+        removed = None
+        if difficulty == "Easy":
+            removed = 30
+        elif difficulty == "Medium":
+            removed = 40
+        else:
+            removed = 50
+
+        self.OriginalBoard = generate_sudoku(9, difficulty)
+        self.CurrentInternalBoard = self.OriginalBoard
+
+        self.CurrentCellBoard = self.CreateCellTable()
+        self.SelectedCell = None
+        print(self.CurrentInternalBoard)
+
+    def CreateCellTable(self):
+        CellTable = [[0 for i in range(9)] for j in range(9)]
+
+        for row in range(9):
+            for col in range(9):
+                CellTable[row][col] = Cell(self.CurrentInternalBoard[row][col], row, col, self.screen)
+
+        return CellTable
+
+    def draw(self):
+        self.screen.fill((255, 255, 255))
+
+        for i in range(1, 3):
+            pygame.draw.line(self.screen, LINE_COLOR, (0, SQUARE_SIZE * i), (WIDTH, SQUARE_SIZE * i), LINE_WIDTH)
+
+        for i in range(1, 9):
+            pygame.draw.line(self.screen, LINE_COLOR, (0, CELL_SIZE * i), (WIDTH, CELL_SIZE * i), int(LINE_WIDTH / 3))
+
+        for i in range(1, 3):
+            pygame.draw.line(self.screen, LINE_COLOR, (SQUARE_SIZE * i, 0), (SQUARE_SIZE * i, HEIGHT), LINE_WIDTH)
+
+        for i in range(1, 9):
+            pygame.draw.line(self.screen, LINE_COLOR, (CELL_SIZE * i, 0), (CELL_SIZE * i, HEIGHT), int(LINE_WIDTH / 3))
+
+        pygame.font.init()
+        font = pygame.font.SysFont('Arial', 20, bold=False)
+
+        for row in range(9):
+            for col in range(9):
+                self.CurrentCellBoard[row][col].draw(self.SelectedCell)
+
+    def select(self, row, col):
+        self.SelectedCell = [row, col]
+        self.draw()
+
+    def click(self, x, y):
+        for i in range(2):
+            if abs(x - ((i + 1) * 200)) <= int(LINE_WIDTH):
+                return None
+
+        for i in range(8):
+            if abs(x - ((i + 1) * (CELL_SIZE))) <= int(LINE_WIDTH / 3):
+                return None
+
+        Xcell = math.floor(x / (600 / 9))
+
+        for i in range(2):
+            if abs(y - ((i + 1) * 200)) <= int(LINE_WIDTH):
+                return None
+
+        for i in range(8):
+            if abs(y - ((i + 1) * (CELL_SIZE))) <= int(LINE_WIDTH / 3):
+                return None
+
+        Ycell = math.floor(y / (CELL_SIZE))
+
+        return [Xcell, Ycell]
+
+    def clear(self):
+        Board[self.width][self.height] == " "
+
+    def sketch(self, value):
+        if self.CurrentCellBoard[self.SelectedCell[1]][self.SelectedCell[0]].value == 0:
+            self.CurrentCellBoard[self.SelectedCell[1]][self.SelectedCell[0]].set_sketched_value(value)
+            self.draw()
+
+    def place_number(self):  # Part done by Jatin
+        if self.CurrentCellBoard[self.SelectedCell[1]][self.SelectedCell[0]].SketchedValue != None:
+            self.CurrentInternalBoard[self.SelectedCell[1]][self.SelectedCell[0]] = self.CurrentCellBoard[self.SelectedCell[1]][self.SelectedCell[0]].SketchedValue
+            self.CurrentCellBoard = self.CreateCellTable()
+            self.draw()
+
+            if self.check_board():
+                newScreen = WScreen(self.screen)
+                newScreen.DrawScreen()
+            else:
+                if self.is_full():
+                    newScreen = LScreen(self.screen)
+                    newScreen.DrawScreen()
+
+
+
+    def reset_to_original(self):
+        self.CurrentInternalBoard = self.OriginalBoard
+        self.draw()
+
+    def is_full(self):
+        num = 0
+        for i in range(9):
+            for j in range(9):
+                if self.CurrentInternalBoard[i][j] != 0:
+                    num += 1
+        if num == 81:
+            return True
+        else:
+            return False
+
+    def update_board(self):
+        self.draw()
+
+    def find_empty(self):
+        found = True
+        while found:
+            for i in range(9):
+                for j in range(9):
+                    if CurrentInternalBoard[i][j] == 0:
+                        return i, j
+                        found = False
+                    else:
+                        continue
+
+    def valid_in_row(self, row, num):
+        if num in self.CurrentInternalBoard[row]:
+            element_counter = self.CurrentInternalBoard[row].count(num)
+
+            if element_counter > 1:
+                return False
+            else:
+                return True
+        else:
+            return True
+
+    def valid_in_col(self, col, num):
+        newColList = []
+        for i in range(9):
+            newColList.append(self.CurrentInternalBoard[i][col])
+
+        element_counter = newColList.count(num)
+
+        if element_counter > 1:
+            return False
+        else:
+            return True
+
+    def valid_in_box(self, row_start, col_start, num):
+        row = row_start
+        col = col_start
+
+        newBoxList = []
+        for i in range(3):
+            for j in range(3):
+                newBoxList.append(self.CurrentInternalBoard[row][col])
+                col += 1
+
+            row += 1
+            col = col_start
+
+        element_counter = newBoxList.count(num)
+
+        if element_counter > 1:
+            return False
+        else:
+            return True
+
+    def check_board(self):
+        if self.is_full():
+            for row in range(9):
+                for col in range(9):
+
+                    row_start = (math.floor(row / 3) * 3)
+                    col_start = (math.floor(col / 3) * 3)
+
+                    isValidInRow = self.valid_in_row(row, self.CurrentInternalBoard[row][col])
+                    isValidInCol = self.valid_in_col(col, self.CurrentInternalBoard[row][col])
+                    isValidInBox = self.valid_in_box(row_start, col_start, self.CurrentInternalBoard[row][col])
+
+                    if isValidInRow and isValidInCol and isValidInBox:
+                        pass
+                        # return True
+                    else:
+                        return False
+
+            # End_screen.WScreen(screen)
+            return True
+        else:
+            return False

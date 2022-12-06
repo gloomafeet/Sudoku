@@ -2,90 +2,116 @@ import pygame
 from constants import *
 from cell import Cell
 
+
 class Board:
-    def __init__(self, rows, cols, width, height, screen):
-        self.rows = rows
-        self.cols = cols
+    def _init_(self, width, height, screen, difficulty):
         self.width = width
         self.height = height
         self.screen = screen
-        self.board = self.initialize_board()
-        self.cells = [[Cell(self.board[i][j], i, j, self.height//self.rows,
-                            self.width//self.cols) for j in range(cols)] for i in range(rows)]
+        self.difficulty = difficulty
 
-    def initialize_board(self):
-        board = []
-        for i in range(3):
-            row = []
-            for j in range(3):
-                row.append("-")
-            board.append(row)
-        return board
+        removed = None
+        if difficulty == "Easy":
+            removed = 30
+        elif difficulty == "Medium":
+            removed = 40
+        else:
+            removed = 50
 
-    def print_board(self):
-        for i, row in enumerate(self.board):
-            for j, col in enumerate(row):
-                print(self.board[i][j], end=" ")
-            print()
+        self.board = generate_sudoku(9, removed)
+        print(self.board)
 
     def draw(self):
-        # draw lines
         for i in range(1, 3):
-            pygame.draw.line(self.screen, LINE_COLOR, (0, SQUARE_SIZE * i),
-                             (WIDTH, SQUARE_SIZE * i), LINE_WIDTH)
-        # draw vertical lines
+            pygame.draw.line(self.screen, LINE_COLOR, (0, SQUARE_SIZE * i), (WIDTH, SQUARE_SIZE * i), LINE_WIDTH)
+
+        for i in range(1, 9):
+            pygame.draw.line(self.screen, LINE_COLOR, (0, CELL_SIZE * i), (WIDTH, CELL_SIZE * i), int(LINE_WIDTH / 3))
+
         for i in range(1, 3):
-            pygame.draw.line(self.screen, LINE_COLOR, (SQUARE_SIZE * i, 0),
-                             (SQUARE_SIZE * i, HEIGHT), LINE_WIDTH)
+            pygame.draw.line(self.screen, LINE_COLOR, (SQUARE_SIZE * i, 0), (SQUARE_SIZE * i, HEIGHT), LINE_WIDTH)
 
-            # draw lines
         for i in range(1, 9):
-            pygame.draw.line(self.screen, LINE_COLOR, (0, SQUARE_SIZE//3 * i),
-                                 (WIDTH, SQUARE_SIZE//3 * i), LINE_WIDTH//3)
-            # draw vertical lines
-        for i in range(1, 9):
-            pygame.draw.line(self.screen, LINE_COLOR, (SQUARE_SIZE//3 * i, 0),
-                                 (SQUARE_SIZE//3 * i, HEIGHT), LINE_WIDTH//3)
+            pygame.draw.line(self.screen, LINE_COLOR, (CELL_SIZE * i, 0), (CELL_SIZE * i, HEIGHT), int(LINE_WIDTH / 3))
 
-        for i in range(self.rows):
-            for j in range(self.cols):
-                self.cells[i][j].draw(self.screen)
+        pygame.font.init()
+        font = pygame.font.SysFont('Arial', 20, bold=False)
 
-    def mark_square(self, row, col, chip_type):
-        self.board[row][col] = chip_type
-        self.update_cells()
+        for row in range(9):
+            for col in range(9):
+                if self.board[row][col] != 0:
+                    img = font.render(str(self.board[row][col]), True, pygame.Color(0, 0, 0),
+                                      pygame.Color(255, 255, 255))
+                    position = (
+                        (CELL_SIZE * col + (CELL_SIZE / 2)) - 5,
+                        (CELL_SIZE * row + (CELL_SIZE / 2)) - 10
+                    )
+                    self.screen.blit(img, position)
 
-    def update_cells(self):
-        self.cells = [[Cell(self.board[i][j], i, j, self.height//self.rows,
-                            self.width//self.cols) for j in range(self.cols)] for i in range(self.rows)]
+    def select(self, row, col):
+        currentcellvalue = 0  # board[row][col]
+        currentcell = Cell(currentcellvalue, row, col, self.screen)
+        currentcell.draw()
 
-    def available_square(self, row, col):
-        return self.board[row][col] == '-'
+    def click(self, x, y):
+        for i in range(2):
+            if abs(x - ((i + 1) * 200)) <= int(LINE_WIDTH):
+                return None
 
-    def check_if_winner(self, chip_type):
-        for i in range(self.rows):
-            if self.board[i][0] == self.board[i][1] and self.board[i][1] == self.board[i][2] and self.board[i][2] == chip_type:
-                return True
+        for i in range(8):
+            if abs(x - ((i + 1) * (CELL_SIZE))) <= int(LINE_WIDTH / 3):
+                return None
 
-        for j in range(self.cols):
-            if self.board[0][j] == self.board[1][j] and self.board[1][j] == self.board[2][j] and self.board[2][j] == chip_type:
-                return True
+        Xcell = math.floor(x / (600 / 9))
 
-        if self.board[0][0] == self.board[1][1] and self.board[1][1] == self.board[2][2] and self.board[2][2] == chip_type:
+        for i in range(2):
+            if abs(y - ((i + 1) * 200)) <= int(LINE_WIDTH):
+                return None
+
+        for i in range(8):
+            if abs(y - ((i + 1) * (CELL_SIZE))) <= int(LINE_WIDTH / 3):
+                return None
+
+        Ycell = math.floor(y / (CELL_SIZE))
+
+        return [Xcell, Ycell]
+
+    def clear(self):
+        Board[self.width][self.height] == " "
+
+    def sketch(self, value):
+        pass
+
+    def place_number(self, value):
+        pass
+
+    def reset_to_original(self):
+        pass
+
+    def is_full(self):
+        num = 0
+        for i in range(9):
+            for j in range(9):
+                if board[i][j] != 0:
+                    num += 1
+        if num == 81:
             return True
+        else:
+            return False
 
-        if self.board[2][0] == self.board[1][1] == self.board[0][2] == chip_type:
-            return True
+    def update_board(self):
+        pass
 
-        return False
+    def find_empty(self):
+        found = True
+        while found:
+            for i in range(9):
+                for j in range(9):
+                    if board[i][j] == 0:
+                        return i, j
+                        found = False
+                    else:
+                        continue
 
-    def board_is_full(self):
-        for i in range(self.rows):
-            for j in range(self.cols):
-                if self.board[i][j] == '-':
-                    return False
-        return True
-
-    def reset_board(self):
-        self.board = self.initialize_board()
-        self.update_cells()
+    def check_board(self):
+        pass
