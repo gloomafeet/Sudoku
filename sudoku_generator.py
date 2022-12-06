@@ -2,7 +2,7 @@ import pygame
 import math, random
 from constants import *
 from End_screen import *
-
+from copy import deepcopy
 import math, random
 
 
@@ -16,7 +16,7 @@ class SudokuGenerator:
 
     # initializes rows, removed cells, and board with 0s
     def get_board(self):
-        return self.board
+        return deepcopy(self.board)
 
     # returns board
     def print_board(self):
@@ -134,10 +134,8 @@ class SudokuGenerator:
 def generate_sudoku(size, removed):
     sudoku = SudokuGenerator(size, removed)
     sudoku.fill_values()
-    board = sudoku.get_board()
     sudoku.remove_cells()
-    board = sudoku.get_board()
-    return board
+    return deepcopy(sudoku.get_board())
 
 
 # to display the sudoku after we remove cells
@@ -206,7 +204,7 @@ class Board:
             removed = 50
 
         self.OriginalBoard = generate_sudoku(9, difficulty)
-        self.CurrentInternalBoard = self.OriginalBoard
+        self.CurrentInternalBoard = deepcopy(self.OriginalBoard)
 
         self.CurrentCellBoard = self.CreateCellTable()
         self.SelectedCell = None
@@ -295,7 +293,9 @@ class Board:
 
 
     def reset_to_original(self):
-        self.CurrentInternalBoard = self.OriginalBoard
+        self.CurrentInternalBoard = deepcopy(self.OriginalBoard)
+        self.CurrentCellBoard = self.CreateCellTable()
+        self.SelectedCell = None
         self.draw()
 
     def is_full(self):

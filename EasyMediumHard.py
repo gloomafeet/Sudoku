@@ -1,6 +1,5 @@
 import pygame, sys
 from constants import *
-from board import Board
 
 
 def draw_game_start(screen):
