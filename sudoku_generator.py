@@ -207,7 +207,7 @@ class Board:
         self.CurrentCellBoard = self.CreateCellTable()
         self.SelectedCell = None
         print(self.CurrentInternalBoard)
-
+    # creates the table for the entry in cells
     def CreateCellTable(self):
         CellTable = [[0 for i in range(9)] for j in range(9)]
 
@@ -216,7 +216,7 @@ class Board:
                 CellTable[row][col] = Cell(self.CurrentInternalBoard[row][col], row, col, self.screen)
 
         return CellTable
-
+    # draws the table
     def draw(self):
         self.screen.fill((255, 255, 255))
 
@@ -238,11 +238,11 @@ class Board:
         for row in range(9):
             for col in range(9):
                 self.CurrentCellBoard[row][col].draw(self.SelectedCell)
-
+    # marks the selected cell by highlighting its borders
     def select(self, row, col):
         self.SelectedCell = [row, col]
         self.draw()
-
+    #returns a tuple of the cell clicked in the row and column
     def click(self, x, y):
         for i in range(2):
             if abs(x - ((i + 1) * 200)) <= int(LINE_WIDTH):
@@ -268,7 +268,7 @@ class Board:
     # clears the board
     def clear(self):
         Board[self.width][self.height] == " "
-
+    # sets sketched value of the selected cell to value entered
     def sketch(self, value):
         if self.CurrentCellBoard[self.SelectedCell[1]][self.SelectedCell[0]].value == 0:
             self.CurrentCellBoard[self.SelectedCell[1]][self.SelectedCell[0]].set_sketched_value(value)
@@ -306,10 +306,10 @@ class Board:
             return True
         else:
             return False
-
+    # updates the board
     def update_board(self):
         self.draw()
-
+    # finds an empty cell
     def find_empty(self):
         found = True
         while found:
@@ -320,7 +320,7 @@ class Board:
                         found = False
                     else:
                         continue
-
+    # checks if a number is valid in an enitre row
     def valid_in_row(self, row, num):
         if num in self.CurrentInternalBoard[row]:
             element_counter = self.CurrentInternalBoard[row].count(num)
@@ -331,7 +331,7 @@ class Board:
                 return True
         else:
             return True
-
+    # checks if it is valid in entire column
     def valid_in_col(self, col, num):
         newColList = []
         for i in range(9):
@@ -343,7 +343,7 @@ class Board:
             return False
         else:
             return True
-
+    # checks if number is valid in a box
     def valid_in_box(self, row_start, col_start, num):
         row = row_start
         col = col_start
@@ -363,7 +363,7 @@ class Board:
             return False
         else:
             return True
-
+    # checks the entire board if it is correct
     def check_board(self):
         if self.is_full():
             for row in range(9):
