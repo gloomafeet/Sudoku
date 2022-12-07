@@ -139,7 +139,6 @@ def generate_sudoku(size, removed):
 
 
 # to display the sudoku after we remove cells
-
 class Cell:
     def __init__(self, value, row, col, screen):
         self.value = value
@@ -186,7 +185,6 @@ class Cell:
             self.screen.blit(img, position)
 
 
-# check Board.py file and fix it
 class Board:
 
     def __init__(self, width, height, screen, difficulty):
@@ -267,7 +265,7 @@ class Board:
         Ycell = math.floor(y / (CELL_SIZE))
 
         return [Xcell, Ycell]
-
+    # clears the board
     def clear(self):
         Board[self.width][self.height] == " "
 
@@ -275,8 +273,8 @@ class Board:
         if self.CurrentCellBoard[self.SelectedCell[1]][self.SelectedCell[0]].value == 0:
             self.CurrentCellBoard[self.SelectedCell[1]][self.SelectedCell[0]].set_sketched_value(value)
             self.draw()
-
-    def place_number(self):  # Part done by Jatin
+    # enters the number from user in the board and also checks win or loss
+    def place_number(self):
         if self.CurrentCellBoard[self.SelectedCell[1]][self.SelectedCell[0]].SketchedValue != None:
             self.CurrentInternalBoard[self.SelectedCell[1]][self.SelectedCell[0]] = self.CurrentCellBoard[self.SelectedCell[1]][self.SelectedCell[0]].SketchedValue
             self.CurrentCellBoard = self.CreateCellTable()
@@ -290,14 +288,14 @@ class Board:
                     newScreen = LScreen(self.screen)
                     newScreen.DrawScreen()
 
-
-
+    # sets the board to original values
     def reset_to_original(self):
         self.CurrentInternalBoard = deepcopy(self.OriginalBoard)
         self.CurrentCellBoard = self.CreateCellTable()
         self.SelectedCell = None
         self.draw()
 
+    # checks if all the cells are full
     def is_full(self):
         num = 0
         for i in range(9):
